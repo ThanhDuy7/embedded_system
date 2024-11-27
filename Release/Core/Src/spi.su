@@ -1,0 +1,2 @@
+../Core/Src/spi.c:61:6:HAL_SPI_MspInit	40	static
+../Core/Src/spi.c:92:6:HAL_SPI_MspDeInit	0	static

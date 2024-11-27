@@ -1,0 +1,4 @@
+../Core/Src/traffic.c:22:6:traffic_init	5
+../Core/Src/traffic.c:58:6:run_traffic	10
+../Core/Src/traffic.c:110:6:turnOnTrafficLight	5
+../Core/Src/traffic.c:132:6:displayNumb	1

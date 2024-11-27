@@ -24,7 +24,7 @@
 #include "fsmc.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "traffic.h"
 #include "software_timer.h"
 #include "led_7seg.h"
 #include "button.h"
@@ -66,7 +66,6 @@ static void MX_SPI1_Init(void);
 static void MX_FSMC_Init(void);
 /* USER CODE BEGIN PFP */
 void system_init();
-void test_lcd();
 
 /* USER CODE END PFP */
 
@@ -108,24 +107,52 @@ int main(void)
   MX_FSMC_Init();
   /* USER CODE BEGIN 2 */
   system_init();
-  lcd_Clear(BLUE);
+  lcd_Clear(WHITE);
+  uint16_t currentMode = 0;
+  char *modes[] = { "NORMAL", "RED_CONFIG", "GREEN_CONFIG", "YELLOW_CONFIG" };
+  uint16_t cycle = 10;
+  uint16_t newCycle = cycle;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  while(!flag_timer2)
-		  flag_timer2 = 0;
-	  	  button_Scan();
-	  if (button_count[0] >= 40) {
-		  test_lcd();
-	  } else {
-		  lcd_Clear(RED);
+	  while(!flag_timer2);
+	  flag_timer2 = 0;
+	  button_Scan();
+	  if (button_count[0]%20 == 1 ) {
+		  currentMode = (currentMode + 1) % 4;
 	  }
+	  if (currentMode != 0) {
+		  if (button_count[1]%20 == 1) {
+			  if (newCycle >= 99)
+				  newCycle = 1;
+			  else newCycle++;
+		  }
+		  if (button_count[3]%20 == 1) {
+			  if (newCycle <= 0)
+				  newCycle = 99;
+			  else newCycle--;
+		  }
+		  if (button_count[2]%20 == 1){
+			  cycle = newCycle;
+			  traffic_init(currentMode,cycle);
+		  }
+
+
+	  }
+	  run_traffic();
+	  lcd_ShowStr(30, 80, modes[currentMode], WHITE, RED, 24,0);
+	  lcd_ShowStr(30, 160, "modified cycle", WHITE, RED, 24,
+	  	  0);
+	  lcd_ShowIntNum(30, 120, cycle, 2, WHITE, BLUE, 32);
+	  lcd_ShowIntNum(30, 160, newCycle, 2, WHITE, BLUE, 32);
+
   }
   /* USER CODE END 3 */
 }
@@ -413,11 +440,14 @@ void system_init() {
 	led7_init();
 	timer_init();
 	setTimer2(50);
+	//setTimer3(500);
 }
 
 void test_lcd() {
 	lcd_Fill(10, 20, 100, 100, GREEN);
 }
+
+
 /* USER CODE END 4 */
 
 /**
