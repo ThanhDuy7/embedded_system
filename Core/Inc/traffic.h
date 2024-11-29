@@ -9,9 +9,9 @@
 #define INC_TRAFFIC_H_
 
 #include "main.h"
-//extern uint16_t redCycle;
-//extern uint16_t greenCycle;
-//extern uint16_t yellowCycle;
+extern uint16_t redCycle;
+extern uint16_t greenCycle;
+extern uint16_t yellowCycle;
 extern enum traffic_mode {
 	NORMAL = 0,
 	RED_CONFIG,

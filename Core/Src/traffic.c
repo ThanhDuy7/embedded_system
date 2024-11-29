@@ -11,8 +11,6 @@
 enum traffic_mode currentMode = NORMAL;
 enum traffic_light currentState = RED1_GREEN2;
 enum traffic_light nextState = RED1_GREEN2;
-uint16_t defaultCounter = 5;
-uint16_t defaultLight = 7;
 uint16_t redCycle = 7;
 uint16_t greenCycle = 5;
 uint16_t yellowCycle = 2;
@@ -23,36 +21,32 @@ uint8_t ledState = 0;
 void traffic_init (uint16_t curMode,uint16_t cycle) {
 	if (curMode == 0) {
 		currentMode = NORMAL;
-		defaultCounter = 5;
-		defaultLight = 7;
-		redCycle = 7;
-		greenCycle = 5;
-		counter = 5;
-		light = 7;
-	}
-	if (curMode == 1) {
+	} else if (curMode == 1) {
 		currentMode = RED_CONFIG;
 		redCycle = cycle;
-		defaultLight = redCycle;
-		defaultCounter = defaultLight - yellowCycle;
-		light = defaultLight;
-		counter = defaultCounter;
+		counter = redCycle - yellowCycle; //green cycle
+		greenCycle = counter;
+		light = redCycle;
+		currentState = RED1_GREEN2;
+		nextState = currentState;
 		//lcd_ShowIntNum(160, 160, defaultLight, 2, WHITE, BLUE, 32);
 	} else if (curMode == 2) {
 		currentMode = GREEN_CONFIG;
 		greenCycle = cycle;
-		defaultLight = greenCycle + yellowCycle;
-		defaultCounter = greenCycle;
-		light = defaultLight;
-		counter = defaultCounter;
+		redCycle = greenCycle + yellowCycle;
+		light = redCycle;
+		counter = greenCycle;
+		currentState = RED1_GREEN2;
+		nextState = currentState;
 		//lcd_ShowIntNum(160, 160, defaultLight, 2, WHITE, BLUE, 32);
 	} else if (curMode == 3) {
 		currentMode = YELLOW_CONFIG;
 		yellowCycle = cycle;
-		defaultLight = greenCycle + yellowCycle;
-		defaultCounter = greenCycle;
-		light = defaultLight;
-		counter = defaultCounter;
+		redCycle = greenCycle + yellowCycle;
+		light = redCycle;
+		counter = greenCycle;
+		currentState = RED1_GREEN2;
+		nextState = currentState;
 		//lcd_ShowIntNum(160, 160, defaultLight, 2, WHITE, BLUE, 32);
 	}
 
@@ -65,7 +59,6 @@ void run_traffic() {
 		displayNumb();
 	}
 	if(count_LED_debug == 0) {
-		//displayNumb(light);
 		switch(currentState) {
 			case RED1_GREEN2:
 				//turnOnTrafficLight(currentState);
@@ -82,8 +75,8 @@ void run_traffic() {
 				light--;
 				if (counter <= 0) {
 					nextState = GREEN1_RED2;
-					counter = defaultLight;
-					light = defaultCounter;
+					counter = redCycle;
+					light = greenCycle;
 				}
 				break;
 			case GREEN1_RED2:
@@ -92,7 +85,7 @@ void run_traffic() {
 				light--;
 				if (light <= 0) {
 					nextState = YELLOW1_RED2;
-					//counter = defaultLight - defaultCounter;
+					//ncounter = defaultLight - defaultCounter;
 					light = counter;
 				}
 				break;
@@ -102,8 +95,8 @@ void run_traffic() {
 				light--;
 				if (counter <= 0) {
 					nextState = RED1_GREEN2;
-					counter = defaultCounter;
-					light = defaultLight;
+					counter = greenCycle;
+					light = redCycle;
 				}
 				break;
 		}
@@ -120,11 +113,11 @@ void turnOnTrafficLight(enum traffic_light lightmode) {
 
 	// light coordinate
 	const uint16_t RED1_coordinate[2] = {40,250};
-	const uint16_t RED2_coordinate[2] = {150,250};
+	const uint16_t RED2_coordinate[2] = {150,280};
 	const uint16_t GREEN1_coordinate[2] = {80,250};
-	const uint16_t GREEN2_coordinate[2] = {150,200};
+	const uint16_t GREEN2_coordinate[2] = {150,250};
 	const uint16_t YELLOW1_coordinate[2] = {120,250};
-	const uint16_t YELLOW2_coordinate[2] = {150,120};
+	const uint16_t YELLOW2_coordinate[2] = {150,220};
 
 	switch(lightmode) {
 		case RED1_GREEN2:
@@ -162,9 +155,15 @@ void turnOnTrafficLight(enum traffic_light lightmode) {
 	}
 }
 void displayNumb() {
-	lcd_ShowIntNum(100, 100, redCycle, 2, WHITE, RED, 32);
+	lcd_ShowStr(30, 80, "Red Cycle", WHITE, RED, 24, 0);
+	lcd_ShowIntNum(150, 80, redCycle, 2, WHITE, RED, 24);
 
+	lcd_ShowStr(30, 110, "Green Cycle", WHITE, GREEN, 24, 0);
+	lcd_ShowIntNum(150, 110, greenCycle, 2, WHITE, GREEN, 24);
 
-	lcd_ShowIntNum(40, 280, light, 2, WHITE, BLUE, 32);
-	lcd_ShowIntNum(180, 160, counter, 2, WHITE, BLUE, 32);
+	lcd_ShowStr(30, 140, "Yellow Cycle", BLACK, YELLOW, 24, 0);
+	lcd_ShowIntNum(150, 140, yellowCycle, 2, BLACK, YELLOW, 24);
+
+	lcd_ShowIntNum(40, 280, light, 2,WHITE,BLUE, 32);
+	lcd_ShowIntNum(180, 250, counter, 2, WHITE, BLUE, 32);
 }
