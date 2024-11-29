@@ -112,6 +112,7 @@ int main(void)
   char *modes[] = { "NORMAL", "RED_CONFIG", "GREEN_CONFIG", "YELLOW_CONFIG" };
   uint16_t cycle = 10;
   uint16_t newCycle = cycle;
+  uint8_t confirmChangeCycle = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -127,30 +128,36 @@ int main(void)
 	  button_Scan();
 	  if (button_count[0]%20 == 1 ) {
 		  currentMode = (currentMode + 1) % 4;
+		  confirmChangeCycle = 1;
 	  }
 	  if (currentMode != 0) {
+
+
 		  if (button_count[1]%20 == 1) {
 			  if (newCycle >= 99)
 				  newCycle = 1;
 			  else newCycle++;
+
 		  }
 		  if (button_count[3]%20 == 1) {
 			  if (newCycle <= 0)
 				  newCycle = 99;
 			  else newCycle--;
 		  }
+
 		  if (button_count[2]%20 == 1){
 			  cycle = newCycle;
 			  traffic_init(currentMode,cycle);
+			  confirmChangeCycle = 1;
 		  }
 
 
 	  }
 	  run_traffic();
-	  lcd_ShowStr(30, 80, modes[currentMode], WHITE, RED, 24,0);
-	  lcd_ShowStr(30, 160, "modified cycle", WHITE, RED, 24,
-	  	  0);
-	  lcd_ShowIntNum(30, 120, cycle, 2, WHITE, BLUE, 32);
+	  lcd_ShowStr(30, 50, modes[currentMode], WHITE, RED, 24,0);
+
+
+	  lcd_ShowIntNum(30, 180, cycle, 2, WHITE, BLUE, 32);
 	  lcd_ShowIntNum(30, 160, newCycle, 2, WHITE, BLUE, 32);
 
   }

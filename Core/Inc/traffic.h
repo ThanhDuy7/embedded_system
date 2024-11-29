@@ -9,7 +9,9 @@
 #define INC_TRAFFIC_H_
 
 #include "main.h"
-
+//extern uint16_t redCycle;
+//extern uint16_t greenCycle;
+//extern uint16_t yellowCycle;
 extern enum traffic_mode {
 	NORMAL = 0,
 	RED_CONFIG,
@@ -23,7 +25,7 @@ extern enum traffic_light {
 	YELLOW1_RED2
 };
 void turnOnTrafficLight(enum traffic_light lightmode);
-void displayNumb(uint16_t light,uint16_t counter);
+void displayNumb();
 void traffic_init(uint16_t curMode,uint16_t cycle);
 void run_traffic();
 #endif /* INC_TRAFFIC_H_ */
