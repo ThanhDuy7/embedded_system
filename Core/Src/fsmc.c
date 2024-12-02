@@ -24,6 +24,7 @@
 
 /* USER CODE END 0 */
 
+SRAM_HandleTypeDef hsram1;
 
 /* FSMC initialization function */
 void MX_FSMC_Init(void)

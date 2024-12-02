@@ -24,9 +24,10 @@
 
 /* USER CODE END 0 */
 
+SPI_HandleTypeDef hspi1;
 
 /* SPI1 init function */
-static void MX_SPI1_Init(void)
+void MX_SPI1_Init(void)
 {
 
   /* USER CODE BEGIN SPI1_Init 0 */

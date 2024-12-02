@@ -1,10 +1,9 @@
 /*
  * button.h
  *
- *  Created on: Nov 11, 2024
- *      Author: Thanh Duy
+ *  Created on: Sep 25, 2023
+ *      Author: HaHuyen
  */
-
 
 #ifndef INC_BUTTON_H_
 #define INC_BUTTON_H_
@@ -17,5 +16,5 @@ extern uint16_t button_count[16];
 void button_init();
 void button_Scan();
 
-
 #endif /* INC_BUTTON_H_ */
+

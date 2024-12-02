@@ -37,7 +37,7 @@ extern TIM_HandleTypeDef htim2;
 
 /* USER CODE END Private defines */
 
-static void MX_TIM2_Init(void);
+void MX_TIM2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 

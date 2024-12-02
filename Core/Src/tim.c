@@ -18,15 +18,16 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include <tim.h>
+#include "tim.h"
 
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
+TIM_HandleTypeDef htim2;
 
 /* TIM2 init function */
-static void MX_TIM2_Init(void)
+void MX_TIM2_Init(void)
 {
 
   /* USER CODE BEGIN TIM2_Init 0 */
