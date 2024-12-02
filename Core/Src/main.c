@@ -22,6 +22,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 #include "fsmc.h"
 
@@ -33,7 +34,7 @@
 #include "lcd.h"
 #include "picture.h"
 #include "ds3231.h"
-#include "timer.h"
+#include "uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +54,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t count_led_debug = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,8 +62,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void system_init();
 void test_LedDebug();
-void displayTime();
-void updateTime();
+void test_Uart();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -102,206 +102,22 @@ int main(void)
   MX_SPI1_Init();
   MX_FSMC_Init();
   MX_I2C1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   system_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
- lcd_Clear(BLACK);
- updateTime();
- uint8_t currentMode = 0;
- uint8_t confirmChangeTime = 0;
- uint8_t setAlarmFlag = 0;
- uint8_t holdCounter = 0;
- enum timeElements currentEle = SEC;
- enum timeElements nextEle = currentEle;
- char *modes[] = { "NORMAL", "MODIFY", "SCHEDULE"};
   while (1)
   {
+    /* USER CODE END WHILE */
 	  while(!flag_timer2);
 	  flag_timer2 = 0;
 	  button_Scan();
+	  test_LedDebug();
 	  ds3231_ReadTime();
-	  if (button_count[0]%20 == 1 ) {
-		  currentMode = (currentMode + 1) % 3;
-		  confirmChangeTime = 1;
-	  }
-	  if (currentMode != 0) {
-		  if (confirmChangeTime) {
-			  currentEle = SEC;
-			  nextEle = currentEle;
-			  storeTime();
-			  confirmChangeTime = 0;
-		  }
-			  if (button_count[3]%20 == 1) {
-				  holdCounter = 0;
-				  switch (currentEle){
-				  case SEC:
-					  timeElements[6]++;
-					  if (timeElements[6] >= 60) {
-						  timeElements[6] = 0;
-					  }
-					  nextEle = MIN;
-					  break;
-				  case MIN:
-					  timeElements[5]++;
-					  if (timeElements[5] >= 60) {
-						  timeElements[5] = 0;
-					  }
-					  nextEle = HOUR;
-					  break;
-				  case HOUR:
-					  timeElements[4]++;
-					  if (timeElements[4] >= 24) {
-						  timeElements[4] = 0;
-					  }
-					  nextEle = DAY;
-					  break;
-				  case DAY:
-					  timeElements[3]++;
-					  if (timeElements[3] >= 8) {
-						  timeElements[3] = 1;
-					  }
-					  nextEle = DATE;
-					  break;
-				  case DATE:
-					  timeElements[2]++;
-					  if (timeElements[2] >= 32) {
-						  timeElements[2] = 1;
-					  }
-					  nextEle = MONTH;
-					  break;
-				  case MONTH:
-					  timeElements[1]++;
-					  if (timeElements[1] >= 13) {
-						  timeElements[1] = 1;
-					  }
-					  nextEle = YEAR;
-					  break;
-				  case YEAR:
-					  timeElements[0]++;
-					  if (timeElements[0] >= 100) {
-						  timeElements[0] = 1;
-					  }
-					  break;
-				  }
-
-			  }
-			  if (button_count[3] >= 40) { // Long press behavior
-				  holdCounter++;
-				  if (holdCounter >= 4) { // 4 * 50ms = 200ms
-					  holdCounter = 0; // Reset hold counter
-					  switch (currentEle) {
-						  case SEC:
-							  timeElements[6]++;
-							  if (timeElements[6] >= 60) timeElements[6] = 0;
-							  break;
-						  case MIN:
-							  timeElements[5]++;
-							  if (timeElements[5] >= 60) timeElements[5] = 0;
-							  break;
-						  case HOUR:
-							  timeElements[4]++;
-							  if (timeElements[4] >= 24) timeElements[4] = 0;
-							  break;
-						  case DAY:
-							  timeElements[3]++;
-							  if (timeElements[3] >= 8) timeElements[3] = 1;
-							  break;
-						  case DATE:
-							  timeElements[2]++;
-							  if (timeElements[2] >= 32) timeElements[2] = 1;
-							  break;
-						  case MONTH:
-							  timeElements[1]++;
-							  if (timeElements[1] >= 13) timeElements[1] = 1;
-							  break;
-						  case YEAR:
-							  timeElements[0]++;
-							  if (timeElements[0] >= 100) timeElements[0] = 1;
-							  break;
-					  }
-				  }
-			  }
-			  if (button_count[12]%20 == 1) {
-				  if (currentMode != 2) {
-					  updateTime();
-				  }
-				  if (nextEle == currentEle && currentEle != YEAR) {
-					  switch(currentEle) {
-					  case SEC:
-						  nextEle = MIN;
-						  break;
-					  case MIN:
-						  nextEle = HOUR;
-						  break;
-					  case HOUR:
-						  nextEle = DAY;
-						  break;
-					  case DAY:
-						  nextEle = DATE;
-						  break;
-					  case DATE:
-						  nextEle = MONTH;
-						  break;
-					  case MONTH:
-						  nextEle = YEAR;
-						  break;
-
-					  }
-				  }
-
-				  if (currentEle == YEAR) {
-					  if (currentMode == 2) {
-						  setAlarmFlag = 1;
-						  for (int i = 0; i < 7; i++){
-							  scheduleElements[i] = timeElements[i];
-						  }
-					  }
-					  confirmChangeTime = 1;
-					  currentMode = 0;
-
-				  }
-				  currentEle = nextEle;
-
-
-			  }
-
-			  timeEdit(currentEle);
-
-	  } else displayTime();
-
-	  lcd_ShowStr(30, 50, modes[currentMode], WHITE, RED, 24,0);
-	  if (setAlarmFlag) {
-		  lcd_ShowStr(30, 185, "alarm at" , WHITE, RED, 24,0);
-		  lcd_ShowIntNum(130, 185, 2000 + scheduleElements[0], 2, GREEN, BLACK, 24);
-		  lcd_ShowStr(160, 185, "year" , WHITE, RED, 24,0);
-		  lcd_ShowIntNum(130, 210, scheduleElements[1], 2, GREEN, BLACK, 24);
-		  lcd_ShowStr(160, 210, "month" , WHITE, RED, 24,0);
-		  lcd_ShowIntNum(130, 235, scheduleElements[2], 2, GREEN, BLACK, 24);
-		  lcd_ShowStr(160, 235, "date" , WHITE, RED, 24,0);
-		  lcd_ShowStr(160, 260, (scheduleElements[3] == 1) ? "MONDAY"
-				  	  	  : (scheduleElements[3] == 2) ? "TUESDAY"
-						  : (scheduleElements[3] == 3) ? "WEDNESDAY"
-						  :(scheduleElements[3] == 4) ? "THURSDAY"
-						  : (scheduleElements[3] == 5) ? "FRIDAY"
-						  :(scheduleElements[3] == 6) ? "SATURDAY"
-						  : "SUNDAY", WHITE, RED, 24,0);
-		  lcd_ShowIntNum(20, 260, scheduleElements[4], 2, GREEN, BLACK, 24);
-		  lcd_ShowStr(50, 260, ":" , WHITE, RED, 24,0);
-		  lcd_ShowIntNum(65, 260, scheduleElements[5], 2, GREEN, BLACK, 24);
-		  lcd_ShowStr(100, 260, ":" , WHITE, RED, 24,0);
-		  lcd_ShowIntNum(110, 260, scheduleElements[6], 2, GREEN, BLACK, 24);
-		  if (checkAlarm()) setAlarmFlag = 0;
-  }
-
-
-
-
-
-    /* USER CODE END WHILE */
-
+	  test_Uart();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -360,9 +176,11 @@ void system_init(){
 	  led7_init();
 	  button_init();
 	  lcd_init();
-	  ds3231_init();
+	  uart_init_rs232();
 	  setTimer2(50);
 }
+
+uint16_t count_led_debug = 0;
 
 void test_LedDebug(){
 	count_led_debug = (count_led_debug + 1)%20;
@@ -371,12 +189,6 @@ void test_LedDebug(){
 	}
 }
 
-void test_7seg(){
-	led7_SetDigit(0, 0, 0);
-	led7_SetDigit(5, 1, 0);
-	led7_SetDigit(4, 2, 0);
-	led7_SetDigit(7, 3, 0);
-}
 void test_button(){
 	for(int i = 0; i < 16; i++){
 		if(button_count[i] == 1){
@@ -386,31 +198,16 @@ void test_button(){
 	}
 }
 
-void updateTime(){
-	ds3231_Write(ADDRESS_YEAR, timeElements[0]);
-	ds3231_Write(ADDRESS_MONTH, timeElements[1]);
-	ds3231_Write(ADDRESS_DATE, timeElements[2]);
-	ds3231_Write(ADDRESS_DAY, timeElements[3]);
-	ds3231_Write(ADDRESS_HOUR, timeElements[4]);
-	ds3231_Write(ADDRESS_MIN, timeElements[5]);
-	ds3231_Write(ADDRESS_SEC, timeElements[6]);
+void test_Uart(){
+	if(button_count[12] == 1){
+		uart_Rs232SendNum(ds3231_hours);
+		uart_Rs232SendString(":");
+		uart_Rs232SendNum(ds3231_min);
+		uart_Rs232SendString(":");
+		uart_Rs232SendNum(ds3231_sec);
+		uart_Rs232SendString("\n");
+	}
 }
-
-uint8_t isButtonUp()
-{
-    if (button_count[3] == 1)
-        return 1;
-    else
-        return 0;
-}
-uint8_t isButtonDown()
-{
-    if (button_count[7] == 1)
-        return 1;
-    else
-        return 0;
-}
-
 /* USER CODE END 4 */
 
 /**
