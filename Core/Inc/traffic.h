@@ -12,7 +12,7 @@
 extern uint16_t redCycle;
 extern uint16_t greenCycle;
 extern uint16_t yellowCycle;
-extern enum traffic_mode {
+enum traffic_mode {
 	NORMAL = 0,
 	RED_CONFIG,
 	YELLOW_CONFIG,

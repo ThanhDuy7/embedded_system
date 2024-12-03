@@ -30,6 +30,7 @@
 #include "button.h"
 #include "lcd.h"
 #include "picture.h"
+#include "button_press.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -108,11 +109,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   system_init();
   lcd_Clear(WHITE);
-  uint16_t currentMode = 0;
-  char *modes[] = { "NORMAL", "RED_CONFIG", "GREEN_CONFIG", "YELLOW_CONFIG" };
-  uint16_t cycle = 10;
-  uint16_t newCycle = redCycle;
-  uint8_t confirmChangeCycle = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,56 +123,9 @@ int main(void)
 	  while(!flag_timer2);
 	  flag_timer2 = 0;
 	  button_Scan();
-	  if (button_count[0]%20 == 1 ) {
-		  currentMode = (currentMode + 1) % 4;
-		  confirmChangeCycle = 1;
-	  }
-	  if (currentMode != 0) {
-		  if (confirmChangeCycle) {
-			  switch(currentMode){
-			  case 1:
-				  newCycle = redCycle;
-				  break;
-			  case 2:
-				  newCycle = greenCycle;
-				  break;
-			  case 3:
-				  newCycle = yellowCycle;
-				  break;
-			  default:
-				  newCycle = redCycle;
-				  break;
-			  }
-		  }
-
-		  if (button_count[1]%20 == 1) {
-			  if (newCycle >= 99)
-				  newCycle = 1;
-			  else newCycle++;
-			  confirmChangeCycle = 0;
-
-		  }
-		  if (button_count[3]%20 == 1) {
-			  if (newCycle <= 0)
-				  newCycle = 99;
-			  else newCycle--;
-			  confirmChangeCycle = 0;
-		  }
-
-		  if (button_count[2]%20 == 1){
-			  cycle = newCycle;
-			  traffic_init(currentMode,cycle);
-			  confirmChangeCycle = 1;
-		  }
-
-
-	  }
+	  button_press();
 	  run_traffic();
-	  lcd_ShowStr(30, 50, modes[currentMode], WHITE, RED, 24,0);
 
-
-	  lcd_ShowStr(30, 170, "modified", WHITE, BLUE, 24, 0);
-	  lcd_ShowIntNum(150, 170, newCycle, 2, WHITE, BLUE, 32);
 
   }
   /* USER CODE END 3 */
