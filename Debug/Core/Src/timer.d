@@ -32,7 +32,8 @@ Core/Src/timer.o: ../Core/Src/timer.c ../Core/Inc/timer.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Core/Inc/ds3231.h ../Core/Inc/i2c.h ../Core/Inc/utils.h \
- ../Core/Inc/lcd.h ../Core/Inc/gpio.h
+ ../Core/Inc/button.h ../Core/Inc/spi.h ../Core/Inc/gpio.h \
+ ../Core/Inc/lcd.h
 ../Core/Inc/timer.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -70,5 +71,7 @@ Core/Src/timer.o: ../Core/Src/timer.c ../Core/Inc/timer.h \
 ../Core/Inc/ds3231.h:
 ../Core/Inc/i2c.h:
 ../Core/Inc/utils.h:
-../Core/Inc/lcd.h:
+../Core/Inc/button.h:
+../Core/Inc/spi.h:
 ../Core/Inc/gpio.h:
+../Core/Inc/lcd.h:

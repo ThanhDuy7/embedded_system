@@ -10,6 +10,7 @@
 
 #include "main.h"
 #include "ds3231.h"
+#include "button.h"
 
 extern uint16_t timeElements[7];
 extern uint16_t scheduleElements[7];
@@ -32,5 +33,6 @@ void storeTime();
 void timeEdit(enum timeElements);
 void displayTime();
 void change_time();
+void button_press();
 
 #endif /* INC_TIMER_H_ */
